@@ -23,3 +23,9 @@ uv init
         AlignType.INS: "#FFA500",      # 오렌지 (추가)
     }
 ```
+
+## build
+
+```bash
+pyinstaller --noconsole --onefile --icon="icon.ico" --add-data="icon.png;." --name "liveText_Inspector" main.py
+```

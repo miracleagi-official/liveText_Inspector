@@ -2,6 +2,7 @@
 main.py - STT Live Monitor 메인 애플리케이션
 """
 import tkinter as tk
+from tkinter import ttk, messagebox
 import threading
 import socket
 import struct
@@ -13,6 +14,8 @@ from dotenv import load_dotenv
 from ui import MainWindow
 from alignment import compute_alignment, AlignType
 
+from etc import get_base_dir, resource_path
+
 # 환경 변수 로드
 load_dotenv()
 
@@ -21,6 +24,13 @@ class STTMonitorApp:
     """STT 모니터 애플리케이션 컨트롤러"""
     
     def __init__(self, root: tk.Tk):
+        
+        # 1. .env 파일 경로 설정 (실행파일과 같은 위치)
+        env_path = os.path.join(get_base_dir(), ".env")
+        
+        # 2. 로드 시도 및 결과 확인
+        is_loaded = load_dotenv(env_path)
+        
         # 설정 로드
         self.HOST = os.getenv("HOST", "127.0.0.1")
         self.PORT = int(os.getenv("PORT", "26071"))
@@ -41,6 +51,19 @@ class STTMonitorApp:
         # UI 초기화
         self.ui = MainWindow(root)
         self._bind_ui_callbacks()
+        
+        if is_loaded:
+            msg = (f".env 설정을 불러왔습니다.\n\n"
+                   f"Path: {env_path}\n"
+                   f"HOST: {self.HOST}\n"
+                   f"PORT: {self.PORT}\n"
+                   f"CHECKCODE: {self.RESP_CHECKCODE}\n")
+            messagebox.showinfo("설정 로드 성공", msg)
+        else:
+            msg = (f".env 파일을 찾을 수 없어 기본값으로 시작합니다.\n\n"
+                   f"시도한 경로: {env_path}\n"
+                   f"기본 PORT: {self.PORT}")
+            messagebox.showwarning("설정 로드 실패", msg)
         
     def _bind_ui_callbacks(self):
         """UI 콜백 바인딩"""

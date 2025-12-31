@@ -7,6 +7,7 @@ from typing import Callable, Optional, List
 
 from alignment import AlignedToken, AlignType, PartialMetrics
 
+from etc import resource_path
 
 class MainWindow:
     """STT Live Monitor UI"""
@@ -32,6 +33,9 @@ class MainWindow:
         self._on_start_server: Optional[Callable[[], None]] = None
         self._on_reset: Optional[Callable[[], None]] = None
         self._on_closing: Optional[Callable[[], None]] = None
+        
+        icon_path = resource_path("icon.png")
+        self.root.iconphoto(False, tk.PhotoImage(file=icon_path))
         
         self._setup_ui()
         self._setup_tags()
