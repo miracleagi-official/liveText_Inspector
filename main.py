@@ -96,19 +96,21 @@ class STTMonitorApp:
         self.ui.reset_metrics()
         if self.reference_text:
             self.ui.render_text(self.reference_text, AlignType.PENDING.value)
+        else:
+            self.ui.render_text("", "pending")  # 화면 클리어
             
     def _start_server(self):
         """모니터링 서버 시작"""
-        if not self.reference_text:
-            self.ui.show_warning("경고", "대본 파일을 먼저 로드해주세요.")
-            return
-            
         if self.is_running:
             return
             
         self.is_running = True
         self.ui.set_monitoring_mode(True)
-        self.ui.set_status(f"모니터링 중... ({self.HOST}:{self.PORT})", "red")
+        
+        if self.reference_text:
+            self.ui.set_status(f"모니터링 중... ({self.HOST}:{self.PORT})", "red")
+        else:
+            self.ui.set_status(f"출력 모드 (대본 없음) - {self.HOST}:{self.PORT}", "orange")
         
         # 서버 스레드 시작
         threading.Thread(target=self._server_loop, daemon=True).start()
@@ -194,13 +196,15 @@ class STTMonitorApp:
             
     def _update_display(self):
         """정렬 수행 및 UI 업데이트"""
-        if not self.reference_text:
-            return
-            
         with self._tokens_lock:
             if not self.hypothesis_tokens:
                 return
             hyp_text = " ".join(self.hypothesis_tokens)
+        
+        # 대본이 없으면 단순 출력 모드
+        if not self.reference_text:
+            self.ui.render_text(hyp_text, "hit")  # 초록색으로 출력
+            return
             
         # 정렬 및 메트릭 계산
         aligned_tokens, metrics = compute_alignment(self.reference_text, hyp_text)
