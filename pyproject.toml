@@ -7,5 +7,6 @@ requires-python = ">=3.11"
 dependencies = [
     "jiwer>=4.0.0",
     "matplotlib>=3.10.8",
+    "pyinstaller>=6.18.0",
     "python-dotenv>=1.2.1",
 ]
