@@ -42,6 +42,7 @@ class STTMonitorApp:
         self.SUBTITLE_HOST = os.getenv("SUBTITLE_HOST", "127.0.0.1")
         self.SUBTITLE_PORT = int(os.getenv("SUBTITLE_PORT", "26071"))
         self.SUBTITLE_CHECKCODE = int(os.getenv("RESP_CHECKCODE", "20250918"), 0)
+        self.OUTPUT_SUBTITLE_INSERTER_ENABLE = os.getenv("OUTPUT_SUBTITLE_INSERTER_ENABLE", "false").lower() == "true"
         
         # 유사도 임계값 (환경변수로 조정 가능)
         self.SIMILARITY_THRESHOLD = float(os.getenv("SIMILARITY_THRESHOLD", "0.6"))
@@ -63,7 +64,7 @@ class STTMonitorApp:
         self.subtitle_connected = False
         
         # UI 초기화
-        self.ui = MainWindow(root)
+        self.ui = MainWindow(root, appVersion="1.0.0")
         self._bind_ui_callbacks()
         
         if is_loaded:
@@ -79,9 +80,14 @@ class STTMonitorApp:
                    f"모니터 PORT: {self.PORT}\n"
                    f"자막 PORT: {self.SUBTITLE_PORT}")
             messagebox.showwarning("설정 로드 실패", msg)
+            
+        self.subtitle_client = None
+        if self.OUTPUT_SUBTITLE_INSERTER_ENABLE:        
+            # 자막 서버 연결 시도
+            self._connect_subtitle_server()
+        else :
+            self.ui.set_subtitle_status("자막 서버 출력 비활성화", "gray")            
         
-        # 자막 서버 연결 시도
-        self._connect_subtitle_server()
         
         # 자동으로 모니터 서버 시작
         self._auto_start_server()

@@ -26,9 +26,9 @@ class MainWindow:
         AlignType.INS: "#FFA500",      # 오렌지 (추가)
     }
     
-    def __init__(self, root: tk.Tk):
+    def __init__(self, root: tk.Tk, appVersion: str):
         self.root = root
-        self.root.title("STT Live Monitor (Script Matcher)")
+        self.root.title(f"STT Live Monitor {appVersion}")
         self.root.geometry("640x480")
         
         self.font_style = ("Malgun Gothic", 8)
